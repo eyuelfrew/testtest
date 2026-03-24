@@ -1,0 +1,899 @@
+{
+    "status": "ok",
+    "fields": [
+        {
+            "name": "attr_1516_address",
+            "pos": 1,
+            "label": "Property Address",
+            "placeholder": null,
+            "hint": "e.g 12, Gwani Street",
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "input",
+            "validation": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "The length should be less than 50",
+                    "value": "50"
+                },
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "multifield": false,
+            "value": null
+        },
+        {
+            "name": "attr_104_estate_name",
+            "pos": 3,
+            "label": "Estate Name",
+            "placeholder": null,
+            "hint": "e.g Emerald Estate",
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "input",
+            "validation": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "The length should be less than 60",
+                    "value": "60"
+                }
+            ],
+            "multifield": false,
+            "value": null
+        },
+        {
+            "name": "attr_188_property_type",
+            "pos": 4,
+            "label": "Property Type",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select_extend",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 204221,
+                    "value": "Apartment",
+                    "id_name": 204221
+                },
+                {
+                    "id": 1029962,
+                    "value": "Block of Flats",
+                    "id_name": 1029962
+                },
+                {
+                    "id": 204224,
+                    "value": "Bungalow",
+                    "id_name": 204224
+                },
+                {
+                    "id": 1029969,
+                    "value": "Chalet",
+                    "id_name": 1029969
+                },
+                {
+                    "id": 1029968,
+                    "value": "Condo",
+                    "id_name": 1029968
+                },
+                {
+                    "id": 204225,
+                    "value": "Duplex",
+                    "id_name": 204225
+                },
+                {
+                    "id": 1029967,
+                    "value": "Farm House",
+                    "id_name": 1029967
+                },
+                {
+                    "id": 204222,
+                    "value": "House",
+                    "id_name": 204222
+                },
+                {
+                    "id": 1029966,
+                    "value": "Maisonette",
+                    "id_name": 1029966
+                },
+                {
+                    "id": 890697,
+                    "value": "Mansion",
+                    "id_name": 890697
+                },
+                {
+                    "id": 204223,
+                    "value": "Mini Flat",
+                    "id_name": 204223
+                },
+                {
+                    "id": 890696,
+                    "value": "Penthouse",
+                    "id_name": 890696
+                },
+                {
+                    "id": 1029965,
+                    "value": "Room & Parlour",
+                    "id_name": 1029965
+                },
+                {
+                    "id": 1029964,
+                    "value": "Studio Apartment",
+                    "id_name": 1029964
+                },
+                {
+                    "id": 1029963,
+                    "value": "Townhouse/Terrace",
+                    "id_name": 1029963
+                },
+                {
+                    "id": 890695,
+                    "value": "Villa",
+                    "id_name": 890695
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1574_condition",
+            "pos": 6,
+            "label": "Condition",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 1001582,
+                    "value": "Fairly Used",
+                    "id_name": 1001582
+                },
+                {
+                    "id": 1001581,
+                    "value": "Newly-Built",
+                    "id_name": 1001581
+                },
+                {
+                    "id": 1416244,
+                    "value": "Off-Plan",
+                    "id_name": 1416244
+                },
+                {
+                    "id": 1001585,
+                    "value": "Old",
+                    "id_name": 1001585
+                },
+                {
+                    "id": 1048669,
+                    "value": "Renovated",
+                    "id_name": 1048669
+                },
+                {
+                    "id": 1416242,
+                    "value": "Uncompleted Building",
+                    "id_name": 1416242
+                },
+                {
+                    "id": 1416243,
+                    "value": "Under construction",
+                    "id_name": 1416243
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_38_bedrooms",
+            "pos": 10,
+            "label": "Bedrooms",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "int",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 5336,
+                    "value": 1,
+                    "id_name": 5336
+                },
+                {
+                    "id": 5337,
+                    "value": 2,
+                    "id_name": 5337
+                },
+                {
+                    "id": 5338,
+                    "value": 3,
+                    "id_name": 5338
+                },
+                {
+                    "id": 5339,
+                    "value": 4,
+                    "id_name": 5339
+                },
+                {
+                    "id": 5340,
+                    "value": 5,
+                    "id_name": 5340
+                },
+                {
+                    "id": 5341,
+                    "value": 6,
+                    "id_name": 5341
+                },
+                {
+                    "id": 5342,
+                    "value": 7,
+                    "id_name": 5342
+                },
+                {
+                    "id": 5343,
+                    "value": 8,
+                    "id_name": 5343
+                },
+                {
+                    "id": 5344,
+                    "value": 9,
+                    "id_name": 5344
+                },
+                {
+                    "id": 5345,
+                    "value": 10,
+                    "id_name": 5345
+                },
+                {
+                    "id": 1488724,
+                    "value": 11,
+                    "id_name": 1488724
+                },
+                {
+                    "id": 1488725,
+                    "value": 12,
+                    "id_name": 1488725
+                },
+                {
+                    "id": 1488726,
+                    "value": 13,
+                    "id_name": 1488726
+                },
+                {
+                    "id": 1488727,
+                    "value": 14,
+                    "id_name": 1488727
+                },
+                {
+                    "id": 1488728,
+                    "value": 15,
+                    "id_name": 1488728
+                },
+                {
+                    "id": 1488729,
+                    "value": 16,
+                    "id_name": 1488729
+                },
+                {
+                    "id": 1488730,
+                    "value": 17,
+                    "id_name": 1488730
+                },
+                {
+                    "id": 1488731,
+                    "value": 18,
+                    "id_name": 1488731
+                },
+                {
+                    "id": 1488732,
+                    "value": 19,
+                    "id_name": 1488732
+                },
+                {
+                    "id": 1488733,
+                    "value": 20,
+                    "id_name": 1488733
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 5338,
+                    "value": 3
+                },
+                {
+                    "id_name": 5337,
+                    "value": 2
+                },
+                {
+                    "id_name": 5340,
+                    "value": 5
+                },
+                {
+                    "id_name": 5341,
+                    "value": 6
+                },
+                {
+                    "id_name": 5336,
+                    "value": 1
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_103_bathrooms",
+            "pos": 20,
+            "label": "Bathrooms",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "int",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 5574,
+                    "value": 1,
+                    "id_name": 5574
+                },
+                {
+                    "id": 5575,
+                    "value": 2,
+                    "id_name": 5575
+                },
+                {
+                    "id": 5576,
+                    "value": 3,
+                    "id_name": 5576
+                },
+                {
+                    "id": 5577,
+                    "value": 4,
+                    "id_name": 5577
+                },
+                {
+                    "id": 5578,
+                    "value": 5,
+                    "id_name": 5578
+                },
+                {
+                    "id": 1488744,
+                    "value": 6,
+                    "id_name": 1488744
+                },
+                {
+                    "id": 1488745,
+                    "value": 7,
+                    "id_name": 1488745
+                },
+                {
+                    "id": 1488746,
+                    "value": 8,
+                    "id_name": 1488746
+                },
+                {
+                    "id": 1488747,
+                    "value": 9,
+                    "id_name": 1488747
+                },
+                {
+                    "id": 1488748,
+                    "value": 10,
+                    "id_name": 1488748
+                },
+                {
+                    "id": 1488749,
+                    "value": 11,
+                    "id_name": 1488749
+                },
+                {
+                    "id": 1488750,
+                    "value": 12,
+                    "id_name": 1488750
+                },
+                {
+                    "id": 1488751,
+                    "value": 13,
+                    "id_name": 1488751
+                },
+                {
+                    "id": 1488752,
+                    "value": 14,
+                    "id_name": 1488752
+                },
+                {
+                    "id": 1488753,
+                    "value": 15,
+                    "id_name": 1488753
+                },
+                {
+                    "id": 1488754,
+                    "value": 16,
+                    "id_name": 1488754
+                },
+                {
+                    "id": 1488755,
+                    "value": 17,
+                    "id_name": 1488755
+                },
+                {
+                    "id": 1488756,
+                    "value": 18,
+                    "id_name": 1488756
+                },
+                {
+                    "id": 1488757,
+                    "value": 19,
+                    "id_name": 1488757
+                },
+                {
+                    "id": 1488758,
+                    "value": 20,
+                    "id_name": 1488758
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 5575,
+                    "value": 2
+                },
+                {
+                    "id_name": 5576,
+                    "value": 3
+                },
+                {
+                    "id_name": 5574,
+                    "value": 1
+                },
+                {
+                    "id_name": 5577,
+                    "value": 4
+                },
+                {
+                    "id_name": 5578,
+                    "value": 5
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_6593_toilets",
+            "pos": 21,
+            "label": "Toilets",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "int",
+            "input_type": "single_select",
+            "validation": [],
+            "possible_values": [
+                {
+                    "id": 1522984,
+                    "value": 1,
+                    "id_name": 1522984
+                },
+                {
+                    "id": 1522985,
+                    "value": 2,
+                    "id_name": 1522985
+                },
+                {
+                    "id": 1522986,
+                    "value": 3,
+                    "id_name": 1522986
+                },
+                {
+                    "id": 1522987,
+                    "value": 4,
+                    "id_name": 1522987
+                },
+                {
+                    "id": 1522988,
+                    "value": 5,
+                    "id_name": 1522988
+                },
+                {
+                    "id": 1522989,
+                    "value": 6,
+                    "id_name": 1522989
+                },
+                {
+                    "id": 1522990,
+                    "value": 7,
+                    "id_name": 1522990
+                },
+                {
+                    "id": 1522991,
+                    "value": 8,
+                    "id_name": 1522991
+                },
+                {
+                    "id": 1522992,
+                    "value": 9,
+                    "id_name": 1522992
+                },
+                {
+                    "id": 1522993,
+                    "value": 10,
+                    "id_name": 1522993
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1382_furnishing",
+            "pos": 22,
+            "label": "Furnishing",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 889098,
+                    "value": "Furnished",
+                    "id_name": 889098
+                },
+                {
+                    "id": 889099,
+                    "value": "Semi-Furnished",
+                    "id_name": 889099
+                },
+                {
+                    "id": 889100,
+                    "value": "Unfurnished",
+                    "id_name": 889100
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_192_square_meters",
+            "pos": 23,
+            "label": "Property Size (sqm)",
+            "placeholder": null,
+            "hint": null,
+            "unit": "sqm",
+            "errors": [],
+            "data_type": "int",
+            "input_type": "input",
+            "validation": [
+                {
+                    "type": "MinValue",
+                    "error_message": "The value should be greater than 10.0",
+                    "value": "10.0"
+                },
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                },
+                {
+                    "type": "MaxValue",
+                    "error_message": "The value should be less than 5000.0",
+                    "value": "5000.0"
+                },
+                {
+                    "type": "MaxValue",
+                    "error_message": "Value should be less than 2147483647",
+                    "value": "2147483647.0"
+                },
+                {
+                    "type": "Pattern",
+                    "error_message": "This value seems to be invalid.",
+                    "value": "[0-9,]*"
+                }
+            ],
+            "multifield": false,
+            "value": null
+        },
+        {
+            "name": "attr_1674_facilities",
+            "pos": 24,
+            "label": "Facilities",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "multi_select",
+            "validation": [],
+            "possible_values": [
+                {
+                    "id": 1049078,
+                    "value": "24-hour Electricity",
+                    "id_name": 1049078
+                },
+                {
+                    "id": 1049079,
+                    "value": "Air Conditioning",
+                    "id_name": 1049079
+                },
+                {
+                    "id": 1049080,
+                    "value": "Balcony",
+                    "id_name": 1049080
+                },
+                {
+                    "id": 1049081,
+                    "value": "Chandelier",
+                    "id_name": 1049081
+                },
+                {
+                    "id": 1049082,
+                    "value": "Dining Area",
+                    "id_name": 1049082
+                },
+                {
+                    "id": 1049096,
+                    "value": "Wi-Fi",
+                    "id_name": 1049096
+                }
+            ],
+            "value": []
+        },
+        {
+            "name": "attr_6594_parking_space_new",
+            "pos": 25,
+            "label": "Parking Space",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "bool",
+            "input_type": "input_extend",
+            "validation": [],
+            "multifield": false,
+            "value": null
+        },
+        {
+            "name": "attr_6603_listing_by",
+            "pos": 1750,
+            "label": "Listing by",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select_extend",
+            "validation": [],
+            "possible_values": [
+                {
+                    "id": 1525951,
+                    "value": "Agent",
+                    "id_name": 1525951
+                },
+                {
+                    "id": 1525952,
+                    "value": "Developer",
+                    "id_name": 1525952
+                },
+                {
+                    "id": 1525950,
+                    "value": "Owner",
+                    "id_name": 1525950
+                }
+            ],
+            "value": null
+        },
+        {
+            "id": null,
+            "name": "description",
+            "label": "Description",
+            "title": "Description",
+            "unit": null,
+            "type": "textarea",
+            "input_type": "textarea",
+            "data_type": "str",
+            "validators_list": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "The length should be less than 850",
+                    "value": "850"
+                },
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                },
+                {
+                    "type": "MinLength",
+                    "error_message": "Length should be greater than 20",
+                    "value": "20"
+                }
+            ],
+            "validation": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "The length should be less than 850",
+                    "value": "850"
+                },
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                },
+                {
+                    "type": "MinLength",
+                    "error_message": "Length should be greater than 20",
+                    "value": "20"
+                }
+            ],
+            "errors": [],
+            "placeholder": "Please provide a detailed description. Mentioning as many details as possible will make your Ad more attractive to buyers",
+            "char_counter": true,
+            "hint": "Field must be between 20 and 850 characters long. Note: CAPS LOCK text will be automatically edited",
+            "value": ""
+        },
+        {
+            "id": null,
+            "name": "price",
+            "label": "Price",
+            "title": "Price",
+            "unit": null,
+            "type": "price",
+            "input_type": "price",
+            "data_type": "int",
+            "validators_list": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This Category requires a specific price to be set.",
+                    "value": "true"
+                },
+                {
+                    "type": "MinValue",
+                    "error_message": "The least possible price for such goods is 1",
+                    "value": "1"
+                },
+                {
+                    "type": "MaxValue",
+                    "error_message": "The price is too high",
+                    "value": "99999999999.0"
+                }
+            ],
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This Category requires a specific price to be set.",
+                    "value": "true"
+                },
+                {
+                    "type": "MinValue",
+                    "error_message": "The least possible price for such goods is 1",
+                    "value": "1"
+                },
+                {
+                    "type": "MaxValue",
+                    "error_message": "The price is too high",
+                    "value": "99999999999.0"
+                }
+            ],
+            "errors": [],
+            "currency": "ETB",
+            "price_type": {
+                "0": {
+                    "title": "Not sure",
+                    "checked": true
+                },
+                "1": {
+                    "title": "Yes",
+                    "checked": false
+                },
+                "5": {
+                    "title": "No",
+                    "checked": false
+                }
+            },
+            "value": ""
+        },
+        {
+            "id": null,
+            "name": "user_phone",
+            "label": "Your phone number",
+            "title": "Your phone number",
+            "unit": null,
+            "type": "str_input",
+            "input_type": "input",
+            "data_type": "str_phone",
+            "validators_list": [
+                {
+                    "type": "PhoneRegexp",
+                    "error_message": "Invalid phone number. Please enter the correct number.",
+                    "value": "^(?:2510|251|0|)(\\d{9})$"
+                }
+            ],
+            "validation": [
+                {
+                    "type": "PhoneRegexp",
+                    "error_message": "Invalid phone number. Please enter the correct number.",
+                    "value": "^(?:2510|251|0|)(\\d{9})$"
+                }
+            ],
+            "errors": [],
+            "value": "0928398944"
+        },
+        {
+            "id": null,
+            "name": "video",
+            "label": "Link to Youtube or Facebook video",
+            "title": "Link to Youtube or Facebook video",
+            "unit": null,
+            "type": "str_input",
+            "input_type": "input",
+            "data_type": "str",
+            "validators_list": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "Length should be less than 1024",
+                    "value": "1024"
+                },
+                {
+                    "type": "VideoURL",
+                    "error_message": "The link must lead to a Youtube or Facebook video. Please check it.",
+                    "value": "facebook,youtube"
+                }
+            ],
+            "validation": [
+                {
+                    "type": "MaxLength",
+                    "error_message": "Length should be less than 1024",
+                    "value": "1024"
+                },
+                {
+                    "type": "VideoURL",
+                    "error_message": "The link must lead to a Youtube or Facebook video. Please check it.",
+                    "value": "facebook,youtube"
+                }
+            ],
+            "errors": [],
+            "value": ""
+        }
+    ],
+    "delivery_fields": [],
+    "delivery_limit": 20,
+    "required_count_photos_by_category": 5,
+    "need_load_price_recommendation": false
+}

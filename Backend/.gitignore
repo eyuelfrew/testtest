@@ -1,0 +1,33 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Backend (Express)
+node_modules
+
+
+min/.env.local
+
+# Flutter App
+teftef/.dart_tool/
+teftef/build/
+teftef/.flutter-plugins
+teftef/.flutter-plugins-dependencies
+teftef/.pub-cache/
+teftef/.packages
+teftef/ios/Flutter/Generated.xcconfig
+teftef/ios/Flutter/flutter_export_environment.sh
+teftef/android/key.properties
+teftef/android/app/src/main/res/raw/
+teftef/android/app/src/main/res/values/google-services.json
+teftef/ios/Runner/GoogleService-Info.plist
+*.p12
+*.jks
+*.keystore
+*.mobileprovision

@@ -1,0 +1,534 @@
+{
+    "status": "ok",
+    "fields": [
+        {
+            "name": "attr_176_type",
+            "pos": 1,
+            "label": "Type",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 202677,
+                    "value": "Desktop Computer",
+                    "id_name": 202677
+                },
+                {
+                    "id": 202676,
+                    "value": "Laptop",
+                    "checked": true,
+                    "id_name": 202676
+                },
+                {
+                    "id": 204185,
+                    "value": "Server",
+                    "id_name": 204185
+                }
+            ],
+            "value": {
+                "id": 202676,
+                "value": "Laptop",
+                "checked": true,
+                "id_name": 202676
+            }
+        },
+        {
+            "name": "attr_1179_brand",
+            "pos": 2,
+            "label": "Brand",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "parent_name": "attr_176_type",
+            "possible_values": [
+                {
+                    "id": 267045,
+                    "value": "Toshiba",
+                    "id_name": 267045
+                },
+                {
+                    "id": 267046,
+                    "value": "Touchmate",
+                    "id_name": 267046
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 267067,
+                    "value": "HP"
+                },
+                {
+                    "id_name": 267060,
+                    "value": "Lenovo"
+                }
+            ],
+            "value": {
+                "id": 267060,
+                "value": "Lenovo",
+                "checked": true,
+                "id_name": 267060
+            },
+            "url": "https://jiji.com.et/get_attribute_choices/1179"
+        },
+        {
+            "name": "attr_1180_model",
+            "pos": 3,
+            "label": "Model",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "parent_name": "attr_1179_brand",
+            "possible_values": [
+                {
+                    "id": 271119,
+                    "value": "100e",
+                    "id_name": 271119
+                },
+                {
+                    "id": 271125,
+                    "value": "A7",
+                    "id_name": 271125
+                },
+                {
+                    "id": 271126,
+                    "value": "A8",
+                    "id_name": 271126
+                },
+                {
+                    "id": 271127,
+                    "value": "B470",
+                    "id_name": 271127
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 1081814,
+                    "value": "Legion 5"
+                },
+                {
+                    "id_name": 271372,
+                    "value": "ThinkPad X1 Carbon"
+                },
+                {
+                    "id_name": 271399,
+                    "value": "ThinkPad Yoga"
+                },
+                {
+                    "id_name": 1215212,
+                    "value": "Ideapad 3"
+                },
+                {
+                    "id_name": 1350636,
+                    "value": "Thinkpad X1 Yoga"
+                }
+            ],
+            "value": null,
+            "url": "https://jiji.com.et/get_attribute_choices/1180"
+        },
+        {
+            "name": "attr_1177_subtype",
+            "pos": 4,
+            "label": "Subtype",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "parent_name": "attr_176_type",
+            "possible_values": [
+                {
+                    "id": 266994,
+                    "value": "Chromebooks",
+                    "id_name": 266994
+                },
+                {
+                    "id": 266993,
+                    "value": "Convertible Laptops",
+                    "id_name": 266993
+                },
+                {
+                    "id": 266992,
+                    "value": "Gaming Laptops",
+                    "id_name": 266992
+                },
+                {
+                    "id": 267032,
+                    "value": "Traditional Laptops",
+                    "id_name": 267032
+                },
+                {
+                    "id": 267001,
+                    "value": "Ultrabook",
+                    "id_name": 267001
+                }
+            ],
+            "value": null,
+            "url": "https://jiji.com.et/get_attribute_choices/1177"
+        },
+        {
+            "name": "attr_235_condition",
+            "pos": 5,
+            "label": "Condition",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 204489,
+                    "value": "Brand New",
+                    "id_name": 204489
+                },
+                {
+                    "id": 241828,
+                    "value": "Refurbished",
+                    "id_name": 241828
+                },
+                {
+                    "id": 204490,
+                    "value": "Used",
+                    "id_name": 204490
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1171_processor",
+            "pos": 6,
+            "label": "Processor",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 1546679,
+                    "value": "Qualcomm Snapdragon X Plus",
+                    "id_name": 1546679
+                },
+                {
+                    "id": 1546678,
+                    "value": "Qualcomm Snapdragon X Elite",
+                    "id_name": 1546678
+                },
+                {
+                    "id": 266951,
+                    "value": "Nvidia",
+                    "id_name": 266951
+                },
+                {
+                    "id": 1542971,
+                    "value": "Intel Core Ultra 7",
+                    "id_name": 1542971
+                },
+                {
+                    "id": 1542970,
+                    "value": "Intel Core Ultra 5",
+                    "id_name": 1542970
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 267003,
+                    "value": "Intel Core i7"
+                },
+                {
+                    "id_name": 267004,
+                    "value": "Intel Core i5"
+                },
+                {
+                    "id_name": 279464,
+                    "value": "Intel Core i9"
+                },
+                {
+                    "id_name": 1416896,
+                    "value": "AMD Ryzen 7"
+                },
+                {
+                    "id_name": 1416895,
+                    "value": "AMD Ryzen 5"
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1175_number_of_cores",
+            "pos": 7,
+            "label": "Number of Cores",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [],
+            "possible_values": [
+                {
+                    "id": 266967,
+                    "value": "Single Core",
+                    "id_name": 266967
+                },
+                {
+                    "id": 266969,
+                    "value": "Quad Core",
+                    "id_name": 266969
+                },
+                {
+                    "id": 267081,
+                    "value": "Octa Core",
+                    "id_name": 267081
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1173_ram",
+            "pos": 8,
+            "label": "RAM",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 267000,
+                    "value": "1GB",
+                    "id_name": 267000
+                },
+                {
+                    "id": 266999,
+                    "value": "1.5GB",
+                    "id_name": 266999
+                },
+                {
+                    "id": 266954,
+                    "value": "2GB",
+                    "id_name": 266954
+                },
+                {
+                    "id": 266955,
+                    "value": "3GB",
+                    "id_name": 266955
+                },
+                {
+                    "id": 266956,
+                    "value": "4GB",
+                    "id_name": 266956
+                },
+                {
+                    "id": 266957,
+                    "value": "6GB",
+                    "id_name": 266957
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 266959,
+                    "value": "16GB"
+                },
+                {
+                    "id_name": 266958,
+                    "value": "8GB"
+                },
+                {
+                    "id_name": 266960,
+                    "value": "32GB"
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1176_storage_capacity",
+            "pos": 9,
+            "label": "Storage Capacity",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 1391946,
+                    "value": "4T",
+                    "id_name": 1391946
+                },
+                {
+                    "id": 1028638,
+                    "value": "16 GB",
+                    "id_name": 1028638
+                }
+            ],
+            "popular_values": [
+                {
+                    "id_name": 949476,
+                    "value": "512GB"
+                },
+                {
+                    "id_name": 266981,
+                    "value": "1T"
+                },
+                {
+                    "id_name": 266989,
+                    "value": "256GB"
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_1172_storage_type",
+            "pos": 10,
+            "label": "Storage Type",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 1416903,
+                    "value": "eMMC",
+                    "id_name": 1416903
+                },
+                {
+                    "id": 266952,
+                    "value": "HDD",
+                    "id_name": 266952
+                },
+                {
+                    "id": 1416901,
+                    "value": "HDD+SSD",
+                    "id_name": 1416901
+                },
+                {
+                    "id": 266953,
+                    "value": "SSD",
+                    "id_name": 266953
+                }
+            ],
+            "value": null
+        },
+        {
+            "name": "attr_94_display_size",
+            "pos": 11,
+            "label": "Display Size",
+            "placeholder": null,
+            "hint": null,
+            "unit": "",
+            "errors": [],
+            "data_type": "str",
+            "input_type": "single_select",
+            "validation": [
+                {
+                    "type": "DataRequired",
+                    "error_message": "This field is required.",
+                    "value": "true"
+                }
+            ],
+            "possible_values": [
+                {
+                    "id": 5513,
+                    "value": "more than 21\"",
+                    "id_name": 5513
+                },
+                {
+                    "id": 5512,
+                    "value": "21\"",
+                    "id_name": 5512
+                },
+                {
+                    "id": 5511,
+                    "value": "20.1\"",
+                    "id_name": 5511
+                },
+                {
+                    "id": 5510,
+                    "value": "19\"",
+                    "id_name": 5510
+                }
+            ],
+            "value": null
+        }
+    ]
+}
