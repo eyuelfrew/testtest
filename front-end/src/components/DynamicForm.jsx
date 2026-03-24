@@ -7,6 +7,7 @@ export default function DynamicForm({ fields, onSubmit }) {
     const [errors, setErrors] = useState({});
     const [fieldOptions, setFieldOptions] = useState({});
     const [loadingFields, setLoadingFields] = useState({});
+    const [subFields, setSubFields] = useState({}); // Store sub-fields by parent field + option
 
     useEffect(() => {
         // Initialize form values with defaults
@@ -87,10 +88,36 @@ export default function DynamicForm({ fields, onSubmit }) {
                 [cacheKey]: options.filter(opt => opt.id !== '__FREE_TEXT__'),
                 [`${cacheKey}_freeText`]: hasFreeText
             }));
+
+            // Fetch sub-fields for this selected option
+            if (parentOptionId) {
+                fetchSubFields(field, parentOptionId);
+            }
         } catch (error) {
             console.error('Failed to fetch options:', error);
         } finally {
             setLoadingFields(prev => ({ ...prev, [field.name]: false }));
+        }
+    };
+
+    const fetchSubFields = async (field, triggerOptionId) => {
+        try {
+            const cacheKey = `${field.id}_${triggerOptionId}`;
+            if (subFields[cacheKey]) return; // Already cached
+
+            const response = await fetch(
+                `${API_BASE}/fields/${field.id}/subfields?trigger_option_id=${triggerOptionId}`
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                setSubFields(prev => ({
+                    ...prev,
+                    [cacheKey]: data.subFields || []
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch sub-fields:', error);
         }
     };
 
@@ -252,6 +279,41 @@ export default function DynamicForm({ fields, onSubmit }) {
 
                 {error && (
                     <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
+
+                {/* Render sub-fields for this field if parent has a value */}
+                {field.sub_fields && field.sub_fields.length > 0 && value && (
+                    <div className="mt-4 ml-4 pl-4 border-l-2 border-blue-300">
+                        {field.sub_fields
+                            .filter(sf => sf.trigger_option_id == value)
+                            .map(subField => (
+                                <div key={subField.id} className="mt-3">
+                                    <label className="block text-sm font-medium mb-1">
+                                        {subField.label}
+                                        {subField.required && <span className="text-red-500 ml-1">*</span>}
+                                    </label>
+                                    {subField.input_type === 'single_select' && (
+                                        <select
+                                            value={formValues[subField.name] || ''}
+                                            onChange={(e) => handleChange(subField.name, e.target.value)}
+                                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="">Select...</option>
+                                            <option value="option1">Option 1</option>
+                                            <option value="option2">Option 2</option>
+                                        </select>
+                                    )}
+                                    {subField.input_type === 'text' && (
+                                        <input
+                                            type="text"
+                                            value={formValues[subField.name] || ''}
+                                            onChange={(e) => handleChange(subField.name, e.target.value)}
+                                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                    </div>
                 )}
             </div>
         );

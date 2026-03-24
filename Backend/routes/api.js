@@ -29,6 +29,11 @@ router.get('/fields/:fieldId/options/manage', optionsController.getFieldOptionsM
 router.post('/fields/:fieldId/options', optionsController.addFieldOption);
 router.delete('/fields/:fieldId/options/:optionId', optionsController.deleteFieldOption);
 
+// Sub-fields routes
+router.get('/fields/:fieldId/subfields', formController.getSubFields);
+router.post('/fields/:fieldId/subfields', formController.createSubField);
+router.delete('/fields/:fieldId/subfields/:subFieldId', formController.deleteSubField);
+
 // Debug endpoint - check field data
 router.get('/fields/:fieldId/debug', async (req, res) => {
     try {

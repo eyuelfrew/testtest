@@ -1,4 +1,4 @@
-const { Form, Field, FieldValidation, FieldOption, Category } = require('../models');
+const { Form, Field, FieldValidation, FieldOption, Category, SubField } = require('../models');
 
 // Get form by ID
 exports.getForm = async (req, res) => {
@@ -13,7 +13,8 @@ exports.getForm = async (req, res) => {
           include: [
             { model: FieldValidation, as: 'Validations' },
             { model: FieldOption, as: 'Options' },
-            { model: Field, as: 'parentField', attributes: ['id', 'name'] }
+            { model: Field, as: 'parentField', attributes: ['id', 'name'] },
+            { model: SubField, as: 'SubFields', order: [['pos', 'ASC']] }
           ]
         },
         { model: Category, as: 'categories' }
@@ -53,7 +54,8 @@ exports.getForm = async (req, res) => {
         parent_name: field.parentField ? field.parentField.name : null,
         parent_field_id: field.parent_field_id,
         value: possibleValues.find(v => v.checked) || null,
-        url: field.url
+        url: field.url,
+        sub_fields: field.SubFields || []
       };
     });
 
@@ -432,49 +434,77 @@ exports.updateField = async (req, res) => {
 
     // Find parent field if specified
     let parentFieldId = field.parent_field_id;
-    if (parent_name && parent_name !== field.parent_name) {
-      const parentField = await Field.findOne({
-        where: { form_id: formId, name: parent_name }
-      });
-      if (parentField) {
-        parentFieldId = parentField.id;
+    if (parent_name !== undefined) {
+      if (parent_name) {
+        const parentField = await Field.findOne({
+          where: { form_id: formId, name: parent_name }
+        });
+        if (parentField) {
+          parentFieldId = parentField.id;
+        }
+      } else {
+        parentFieldId = null;
       }
     }
 
-    // Update field
-    await field.update({
-      label,
-      input_type,
-      placeholder,
-      hint,
-      pos,
-      parent_field_id: parentFieldId
-    });
+    // Update field basic properties
+    const updateData = {};
+    if (label !== undefined) updateData.label = label;
+    if (input_type !== undefined) updateData.input_type = input_type;
+    if (placeholder !== undefined) updateData.placeholder = placeholder;
+    if (hint !== undefined) updateData.hint = hint;
+    if (pos !== undefined) updateData.pos = pos;
+    if (parentFieldId !== undefined) updateData.parent_field_id = parentFieldId;
+    
+    await field.update(updateData);
 
-    // Update validations (delete and recreate)
-    await FieldValidation.destroy({ where: { field_id: fieldId } });
-    if (validation && validation.length > 0) {
-      for (const v of validation) {
-        await FieldValidation.create({
-          field_id: fieldId,
-          type: v.type,
-          error_message: v.error_message,
-          value: v.value
-        });
+    // Update validations ONLY if provided in request
+    if (validation !== undefined) {
+      await FieldValidation.destroy({ where: { field_id: fieldId } });
+      if (validation && validation.length > 0) {
+        for (const v of validation) {
+          await FieldValidation.create({
+            field_id: fieldId,
+            type: v.type,
+            error_message: v.error_message,
+            value: v.value
+          });
+        }
       }
     }
 
-    // Update options (delete and recreate) - this preserves parent_option_id
-    await FieldOption.destroy({ where: { field_id: fieldId } });
-    if (possible_values && possible_values.length > 0) {
-      for (const opt of possible_values) {
-        await FieldOption.create({
-          field_id: fieldId,
-          value: opt.value,
-          parent_option_id: opt.parent_option_id || null,
-          checked: opt.checked || false,
-          is_popular: false
+    // Update options ONLY if provided in request
+    // IMPORTANT: Preserve parent_option_id for existing options
+    if (possible_values !== undefined) {
+      // Only update if options are explicitly provided
+      if (possible_values && possible_values.length > 0) {
+        // Get existing options to preserve parent_option_id
+        const existingOptions = await FieldOption.findAll({
+          where: { field_id: fieldId }
         });
+        
+        // Create a map of existing option values to their parent_option_id
+        const existingOptionsMap = {};
+        existingOptions.forEach(opt => {
+          existingOptionsMap[opt.value] = opt.parent_option_id;
+        });
+        
+        // Delete old options
+        await FieldOption.destroy({ where: { field_id: fieldId } });
+        
+        // Recreate options, preserving parent_option_id where possible
+        for (const opt of possible_values) {
+          await FieldOption.create({
+            field_id: fieldId,
+            value: opt.value,
+            parent_option_id: opt.parent_option_id || existingOptionsMap[opt.value] || null,
+            checked: opt.checked || false,
+            is_popular: false
+          });
+        }
+      } else {
+        // If empty array provided, delete all options
+        await FieldOption.destroy({ where: { field_id: fieldId } });
       }
     }
 
@@ -534,6 +564,70 @@ exports.deleteField = async (req, res) => {
     await field.destroy();
 
     res.json({ message: 'Field deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};
+
+// Get sub-fields for a field
+exports.getSubFields = async (req, res) => {
+  try {
+    const { fieldId } = req.params;
+    const { trigger_option_id } = req.query;
+
+    const where = { parent_field_id: fieldId };
+    if (trigger_option_id) {
+      where.trigger_option_id = trigger_option_id;
+    }
+
+    const subFields = await SubField.findAll({
+      where,
+      order: [['pos', 'ASC']]
+    });
+
+    res.json({ status: 'ok', subFields });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};
+
+// Create a sub-field
+exports.createSubField = async (req, res) => {
+  try {
+    const { fieldId } = req.params;
+    const { trigger_option_id, name, label, input_type, pos, required } = req.body;
+
+    const subField = await SubField.create({
+      parent_field_id: fieldId,
+      trigger_option_id,
+      name,
+      label,
+      input_type,
+      pos: pos || 0,
+      required: required || false
+    });
+
+    res.json({ status: 'ok', subField });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+};
+
+// Delete a sub-field
+exports.deleteSubField = async (req, res) => {
+  try {
+    const { fieldId, subFieldId } = req.params;
+
+    const subField = await SubField.findByPk(subFieldId);
+    if (!subField || subField.parent_field_id != fieldId) {
+      return res.status(404).json({ error: 'Sub-field not found' });
+    }
+
+    await subField.destroy();
+    res.json({ message: 'Sub-field deleted successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error', details: err.message });

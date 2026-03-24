@@ -294,6 +294,31 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                             </div>
                         )}
 
+                        {/* Sub-Fields Configuration */}
+                        {formData.input_type === 'single_select' && formData.possible_values && formData.possible_values.length > 0 && (
+                            <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50 mt-4">
+                                <h4 className="text-sm font-semibold text-green-900 mb-2">
+                                    📋 Sub-Fields (Optional)
+                                </h4>
+                                <p className="text-sm text-green-800 mb-3">
+                                    Add extra fields that appear when a specific option is selected
+                                </p>
+                                {field && field.id ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => alert('Sub-fields manager: To be implemented - will allow configuring which fields appear when each option is selected')}
+                                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-medium"
+                                    >
+                                        Manage Sub-Fields
+                                    </button>
+                                ) : (
+                                    <p className="text-xs text-green-700 italic">
+                                        Save this field first, then you can configure sub-fields
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
                         {/* Action Buttons */}
                         <div className="flex gap-3 pt-4 border-t">
                             <button

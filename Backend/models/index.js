@@ -6,6 +6,7 @@ const FieldOptionRelation = require('./FieldOptionRelation');
 const Submission = require('./Submission');
 const Category = require('./Category');
 const FormCategory = require('./FormCategory');
+const SubField = require('./SubField');
 
 // Category self-reference (tree structure)
 Category.hasMany(Category, { foreignKey: 'parent_id', as: 'children' });
@@ -18,6 +19,10 @@ Field.belongsTo(Form, { foreignKey: 'form_id', as: 'Form' });
 // Field self-reference for cascading/parent fields
 Field.belongsTo(Field, { as: 'parentField', foreignKey: 'parent_field_id' });
 Field.hasMany(Field, { as: 'childFields', foreignKey: 'parent_field_id' });
+
+// Field -> SubFields (One-to-Many)
+Field.hasMany(SubField, { foreignKey: 'parent_field_id', as: 'SubFields' });
+SubField.belongsTo(Field, { foreignKey: 'parent_field_id', as: 'parentField' });
 
 // Field -> FieldValidations (One-to-Many)
 Field.hasMany(FieldValidation, { foreignKey: 'field_id', as: 'Validations' });
@@ -58,4 +63,5 @@ module.exports = {
   Submission,
   Category,
   FormCategory,
+  SubField,
 };
