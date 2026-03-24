@@ -8,6 +8,8 @@ export default function OptionDependencyManager({ field, parentField, onClose })
     const [selectedParentOption, setSelectedParentOption] = useState(null);
     const [loading, setLoading] = useState(true);
     const [newOptionValue, setNewOptionValue] = useState('');
+    const [parentSearch, setParentSearch] = useState('');
+    const [childSearch, setChildSearch] = useState('');
 
     useEffect(() => {
         loadData();
@@ -101,79 +103,103 @@ export default function OptionDependencyManager({ field, parentField, onClose })
                         Add options for <strong>{field.label}</strong> and assign them to a <strong>{parentField.label}</strong>
                     </p>
 
-                    {/* Parent Selection Dropdown */}
+                    {/* Parent Selection */}
                     <div className="mb-6">
-                        <label className="block text-sm font-semibold mb-2">
-                            Select {parentField.label}:
-                        </label>
+                        <div className="flex justify-between items-end mb-2">
+                            <label className="block text-sm font-semibold text-gray-700">
+                                Step 1: Select {parentField.label}
+                            </label>
+                            <input
+                                type="text"
+                                placeholder={`Filter ${parentField.label}...`}
+                                value={parentSearch}
+                                onChange={(e) => setParentSearch(e.target.value)}
+                                className="px-3 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-48"
+                            />
+                        </div>
                         <select
-                            value={selectedParentOption}
+                            value={selectedParentOption || ''}
                             onChange={(e) => setSelectedParentOption(Number(e.target.value))}
-                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         >
-                            {parentOptions.map(parent => (
-                                <option key={parent.id} value={parent.id}>
-                                    {parent.value}
-                                </option>
-                            ))}
+                            {!selectedParentOption && <option value="">Select...</option>}
+                            {parentOptions
+                                .filter(p => p.value.toLowerCase().includes(parentSearch.toLowerCase()))
+                                .map(parent => (
+                                    <option key={parent.id} value={parent.id}>
+                                        {parent.value}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 
-                    {/* Add Options Input */}
-                    <div className="mb-6">
-                        <label className="block text-sm font-semibold mb-2">
-                            Add {field.label} options (comma-separated):
+                    {/* Add Options */}
+                    <div className="mb-6 p-4 bg-gray-50 border rounded-lg">
+                        <label className="block text-sm font-semibold mb-2 text-gray-700">
+                            Step 2: Add {field.label} options for "{selectedParent?.value || '...'}"
                         </label>
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={newOptionValue}
                                 onChange={(e) => setNewOptionValue(e.target.value)}
-                                placeholder={`e.g., HP, Dell, Lenovo`}
-                                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder={`e.g., HP, Dell, Lenovo (comma-separated)`}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                                 onKeyPress={(e) => e.key === 'Enter' && handleAddOptions()}
                             />
                             <button
                                 onClick={handleAddOptions}
                                 disabled={!selectedParentOption || !newOptionValue.trim()}
-                                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 font-semibold"
+                                className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
                             >
                                 Add
                             </button>
                         </div>
-                        <p className="text-sm text-gray-600 mt-2">
-                            Options will be created and linked to "{selectedParent?.value || 'select a parent'}"
-                        </p>
                     </div>
 
                     {/* Existing Options List */}
-                    <div className="mb-6">
-                        <h3 className="font-semibold mb-3">Existing {field.label} Options:</h3>
-                        <div className="space-y-2 max-h-60 overflow-y-auto">
-                            {childOptions.length === 0 ? (
-                                <p className="text-gray-500 italic">No options yet. Add options above.</p>
+                    <div className="flex flex-col h-80 border rounded-lg bg-white overflow-hidden">
+                        <div className="p-3 bg-gray-100 border-b flex justify-between items-center">
+                            <h3 className="font-semibold text-gray-700">Existing {field.label} Options</h3>
+                            <input
+                                type="text"
+                                placeholder="Search existing..."
+                                value={childSearch}
+                                onChange={(e) => setChildSearch(e.target.value)}
+                                className="px-3 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-48"
+                            />
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2">
+                            {childOptions.filter(o => o.value.toLowerCase().includes(childSearch.toLowerCase())).length === 0 ? (
+                                <p className="text-gray-500 italic text-center py-8">No matching options found.</p>
                             ) : (
-                                childOptions.map(option => {
-                                    const parent = parentOptions.find(p => p.id === option.parent_option_id);
-                                    return (
-                                        <div key={option.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                                            <div>
-                                                <span className="font-medium">{option.value}</span>
-                                                {parent && (
-                                                    <span className="ml-2 text-sm text-gray-600">
-                                                      → {parent.value}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <button
-                                                onClick={() => handleDeleteOption(option.id)}
-                                                className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    );
-                                })
+                                <div className="grid grid-cols-1 gap-1">
+                                    {childOptions
+                                        .filter(o => o.value.toLowerCase().includes(childSearch.toLowerCase()))
+                                        .map(option => {
+                                            const parent = parentOptions.find(p => p.id === option.parent_option_id);
+                                            return (
+                                                <div key={option.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded border border-transparent hover:border-gray-200 group">
+                                                    <div className="flex items-center">
+                                                        <span className="text-sm font-medium">{option.value}</span>
+                                                        {parent && (
+                                                            <span className="ml-2 px-1.5 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-semibold rounded uppercase border border-blue-100">
+                                                              {parent.value}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteOption(option.id)}
+                                                        className="text-gray-400 hover:text-red-600 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        title="Delete"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            );
+                                        })
+                                    }
+                                </div>
                             )}
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SearchableSelect from './SearchableSelect';
 
 const API_BASE = 'http://localhost:3000/api';
 
@@ -125,24 +126,31 @@ export default function DynamicForm({ fields, onSubmit }) {
         setFormValues(prev => ({ ...prev, [fieldName]: value }));
         setErrors(prev => ({ ...prev, [fieldName]: null }));
 
-        // Clear dependent fields when parent changes
-        fields.forEach(field => {
-            if (field.parent_name === fieldName) {
-                // Clear the child field value
-                setFormValues(prev => ({ ...prev, [field.name]: '' }));
-
-                // Clear ALL cached options for this child field
-                setFieldOptions(prev => {
-                    const newOptions = { ...prev };
-                    Object.keys(newOptions).forEach(key => {
-                        if (key.startsWith(`${field.name}_`)) {
-                            delete newOptions[key];
-                        }
+        // Recursive clear for dependent fields
+        const clearChildren = (parentName) => {
+            fields.forEach(field => {
+                if (field.parent_name === parentName) {
+                    // Update value
+                    setFormValues(prev => ({ ...prev, [field.name]: '' }));
+                    
+                    // Clear ALL cached options for this child field
+                    setFieldOptions(prev => {
+                        const newOptions = { ...prev };
+                        Object.keys(newOptions).forEach(key => {
+                            if (key.startsWith(`${field.name}_`)) {
+                                delete newOptions[key];
+                            }
+                        });
+                        return newOptions;
                     });
-                    return newOptions;
-                });
-            }
-        });
+
+                    // Recurse to children of this child
+                    clearChildren(field.name);
+                }
+            });
+        };
+
+        clearChildren(fieldName);
     };
 
     const validate = () => {
@@ -179,11 +187,22 @@ export default function DynamicForm({ fields, onSubmit }) {
         // Check if field should be disabled (parent not selected)
         const isDisabled = field.parent_name && !formValues[field.parent_name];
 
+        // Is this a conditional (sub) field?
+        if (field.trigger_option_id) {
+            const parentValue = formValues[field.parent_name];
+            // If parent value doesn't match the trigger, don't render at all
+            if (String(parentValue) !== String(field.trigger_option_id)) {
+                return null;
+            }
+        }
+
         // Get options for this field
         let options = field.possible_values || [];
         let allowFreeText = false;
 
-        if (field.parent_name && formValues[field.parent_name]) {
+        const isCascading = field.parent_name && !field.trigger_option_id;
+
+        if (isCascading && formValues[field.parent_name]) {
             // Find the parent field and get the selected option ID
             const parentField = fields.find(f => f.name === field.parent_name);
             const parentValue = formValues[field.parent_name];
@@ -222,22 +241,15 @@ export default function DynamicForm({ fields, onSubmit }) {
 
                 {field.input_type === 'single_select' && (
                     <>
-                        <select
+                        <SearchableSelect
+                            options={options}
                             value={allowFreeText && !options.find(opt => opt.id === value) ? '' : value}
-                            onChange={(e) => handleChange(field.name, e.target.value)}
+                            onChange={(val) => handleChange(field.name, val)}
                             disabled={isDisabled || isLoading}
-                            className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'
-                                } ${isDisabled ? 'bg-gray-100' : ''}`}
-                        >
-                            <option value="">
-                                {isLoading ? 'Loading...' : isDisabled ? 'Select parent first' : 'Select...'}
-                            </option>
-                            {options.map((opt, index) => (
-                                <option key={`${opt.id}-${index}-${opt.value}`} value={opt.id}>
-                                    {opt.value}{opt.isCustom ? ' (custom)' : ''}
-                                </option>
-                            ))}
-                        </select>
+                            isLoading={isLoading}
+                            placeholder={isDisabled ? 'Select parent first' : 'Select...'}
+                            className={error ? 'ring-1 ring-red-500 rounded' : ''}
+                        />
                         {allowFreeText && (
                             <input
                                 type="text"
@@ -279,41 +291,6 @@ export default function DynamicForm({ fields, onSubmit }) {
 
                 {error && (
                     <p className="text-sm text-red-500 mt-1">{error}</p>
-                )}
-
-                {/* Render sub-fields for this field if parent has a value */}
-                {field.sub_fields && field.sub_fields.length > 0 && value && (
-                    <div className="mt-4 ml-4 pl-4 border-l-2 border-blue-300">
-                        {field.sub_fields
-                            .filter(sf => sf.trigger_option_id == value)
-                            .map(subField => (
-                                <div key={subField.id} className="mt-3">
-                                    <label className="block text-sm font-medium mb-1">
-                                        {subField.label}
-                                        {subField.required && <span className="text-red-500 ml-1">*</span>}
-                                    </label>
-                                    {subField.input_type === 'single_select' && (
-                                        <select
-                                            value={formValues[subField.name] || ''}
-                                            onChange={(e) => handleChange(subField.name, e.target.value)}
-                                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        >
-                                            <option value="">Select...</option>
-                                            <option value="option1">Option 1</option>
-                                            <option value="option2">Option 2</option>
-                                        </select>
-                                    )}
-                                    {subField.input_type === 'text' && (
-                                        <input
-                                            type="text"
-                                            value={formValues[subField.name] || ''}
-                                            onChange={(e) => handleChange(subField.name, e.target.value)}
-                                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                    </div>
                 )}
             </div>
         );

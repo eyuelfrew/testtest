@@ -14,11 +14,13 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
         hint: null,
         data_type: 'str',
         value: null,
+        trigger_option_id: null,
         errors: []
     });
 
     const [isRequired, setIsRequired] = useState(false);
     const [optionInput, setOptionInput] = useState('');
+    const [optionSearch, setOptionSearch] = useState('');
     const [showCascadingHelper, setShowCascadingHelper] = useState(false);
 
     useEffect(() => {
@@ -82,6 +84,7 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
 
     const handleParentChange = (parentName) => {
         handleChange('parent_name', parentName || null);
+        handleChange('trigger_option_id', null); // Reset trigger when parent changes
 
         // Auto-generate URL if parent is selected
         if (parentName) {
@@ -207,51 +210,79 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                             />
                         </div>
 
-                        {/* Cascading Dropdown Setup */}
-                        {formData.input_type === 'single_select' && (
-                            <div className="border-2 border-purple-200 rounded-lg p-4 bg-purple-50">
-                                <label className="block text-sm font-medium mb-2 text-purple-900">
-                                    Parent Field (Optional)
-                                </label>
+                        {/* Parent Field & Trigger Configuration (Available for all field types) */}
+                        <div className="border-2 border-purple-200 rounded-lg p-4 bg-purple-50">
+                            <label className="block text-sm font-medium mb-2 text-purple-900">
+                                Parent Field (Optional)
+                            </label>
 
-                                <select
-                                    value={formData.parent_name || ''}
-                                    onChange={(e) => handleParentChange(e.target.value)}
-                                    className="w-full px-3 py-2 border-2 border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
-                                >
-                                    <option value="">None</option>
-                                    {existingFields
-                                        .filter(f => f.name !== formData.name && f.input_type === 'single_select')
-                                        .map(f => (
-                                            <option key={f.name} value={f.name}>
-                                                {f.label}
+                            <select
+                                value={formData.parent_name || ''}
+                                onChange={(e) => handleParentChange(e.target.value)}
+                                className="w-full px-3 py-2 border-2 border-purple-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                            >
+                                <option value="">None</option>
+                                {existingFields
+                                    .filter(f => f.name !== formData.name && f.input_type === 'single_select')
+                                    .map(f => (
+                                        <option key={f.name} value={f.name}>
+                                            {f.label}
+                                        </option>
+                                    ))}
+                            </select>
+
+                            {formData.parent_name && (
+                                <div className="mt-4 p-3 bg-white rounded border border-purple-300">
+                                    <label className="block text-sm font-medium mb-2 text-purple-900">
+                                        Trigger Option (When should this field appear?)
+                                    </label>
+                                    <select
+                                        value={formData.trigger_option_id || ''}
+                                        onChange={(e) => handleChange('trigger_option_id', e.target.value ? parseInt(e.target.value) : null)}
+                                        className="w-full px-3 py-2 border-2 border-purple-200 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
+                                    >
+                                        <option value="">Always (Visible but dependent)</option>
+                                        {existingFields.find(f => f.name === formData.parent_name)?.possible_values?.map(opt => (
+                                            <option key={opt.id} value={opt.id}>
+                                                Show if {existingFields.find(f => f.name === formData.parent_name)?.label} is "{opt.value}"
                                             </option>
                                         ))}
-                                </select>
+                                    </select>
+                                    <p className="text-[10px] text-purple-600 mt-2 italic">
+                                        * Choosing a specific option makes this a "Conditional Field".
+                                    </p>
+                                </div>
+                            )}
 
-                                {formData.parent_name && (
-                                    <div className="mt-3 p-3 bg-white rounded border border-purple-300">
-                                        <p className="text-sm text-purple-800 font-medium mb-1">
-                                            ✓ Cascading field configured
-                                        </p>
-                                        <p className="text-xs text-purple-700">
-                                            After saving, click the 🔗 button on this field to:
-                                        </p>
-                                        <ul className="text-xs text-purple-700 mt-1 ml-4 list-disc">
-                                            <li>Add all {formData.label} options</li>
-                                            <li>Map which options appear for each {existingFields.find(f => f.name === formData.parent_name)?.label}</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                            {formData.input_type === 'single_select' && formData.parent_name && !formData.trigger_option_id && (
+                                <div className="mt-3 p-3 bg-white rounded border border-purple-300">
+                                    <p className="text-sm text-purple-800 font-medium mb-1">
+                                        ✓ Cascading field configured
+                                    </p>
+                                    <p className="text-xs text-purple-700">
+                                        After saving, use the 🔗 button to map which options appear for each parent value.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Options (only for independent dropdowns) */}
                         {formData.input_type === 'single_select' && !formData.parent_name && (
                             <div className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
-                                <label className="block text-sm font-medium mb-2 text-blue-900">
-                                    Options
-                                </label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-sm font-medium text-blue-900">
+                                        Options ({formData.possible_values.length})
+                                    </label>
+                                    {formData.possible_values.length > 5 && (
+                                        <input
+                                            type="text"
+                                            placeholder="Search options..."
+                                            value={optionSearch}
+                                            onChange={(e) => setOptionSearch(e.target.value)}
+                                            className="px-2 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-32"
+                                        />
+                                    )}
+                                </div>
 
                                 <div className="flex gap-2 mb-3">
                                     <input
@@ -265,7 +296,7 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                                     <button
                                         type="button"
                                         onClick={handleAddOption}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium whitespace-nowrap"
                                     >
                                         Add
                                     </button>
@@ -276,19 +307,25 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                                         <p className="text-sm">No options</p>
                                     </div>
                                 ) : (
-                                    <div className="space-y-2 max-h-48 overflow-y-auto bg-white rounded p-2">
-                                        {formData.possible_values.map((opt, index) => (
-                                            <div key={opt.id} className="flex justify-between items-center p-2 bg-gray-50 rounded hover:bg-gray-100 border border-gray-200">
-                                                <span className="font-medium">{opt.value}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveOption(opt.id)}
-                                                    className="text-red-600 hover:text-red-800 text-sm px-2 py-1 hover:bg-red-50 rounded"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        ))}
+                                    <div className="space-y-1 max-h-60 overflow-y-auto bg-white rounded p-2 border border-blue-100">
+                                        {formData.possible_values
+                                            .filter(opt => opt.value.toLowerCase().includes(optionSearch.toLowerCase()))
+                                            .map((opt, index) => (
+                                                <div key={opt.id} className="flex justify-between items-center p-2 hover:bg-blue-50 rounded group transition-colors">
+                                                    <span className="text-sm font-medium text-gray-700">{opt.value}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveOption(opt.id)}
+                                                        className="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        title="Remove option"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        {formData.possible_values.length > 0 && formData.possible_values.filter(opt => opt.value.toLowerCase().includes(optionSearch.toLowerCase())).length === 0 && (
+                                            <p className="text-center py-4 text-xs text-gray-400">No matching options</p>
+                                        )}
                                     </div>
                                 )}
                             </div>

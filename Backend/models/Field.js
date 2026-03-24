@@ -14,7 +14,8 @@ const Field = sequelize.define('Field', {
     unit: { type: DataTypes.STRING },
     pos: { type: DataTypes.INTEGER, defaultValue: 0 },
     url: { type: DataTypes.STRING }, // endpoint for dynamic options
-    parent_field_id: { type: DataTypes.INTEGER, allowNull: true } // for cascading fields
+    parent_field_id: { type: DataTypes.INTEGER, allowNull: true }, // for cascading fields
+    trigger_option_id: { type: DataTypes.INTEGER, allowNull: true } // option ID that triggers visibility
 }, { timestamps: true });
 
 module.exports = Field;

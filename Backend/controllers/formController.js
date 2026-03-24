@@ -53,6 +53,7 @@ exports.getForm = async (req, res) => {
         popular_values: popularValues,
         parent_name: field.parentField ? field.parentField.name : null,
         parent_field_id: field.parent_field_id,
+        trigger_option_id: field.trigger_option_id,
         value: possibleValues.find(v => v.checked) || null,
         url: field.url,
         sub_fields: field.SubFields || []
@@ -111,7 +112,8 @@ exports.createForm = async (req, res) => {
         
         const field = await createField(form.id, { 
           ...fieldData, 
-          parent_field_id: parentFieldId 
+          parent_field_id: parentFieldId,
+          trigger_option_id: fieldData.trigger_option_id || null
         }, createdFields);
         
         createdFields.push(field);
@@ -256,7 +258,8 @@ async function createField(formId, fieldData, allFields = []) {
     unit: fieldData.unit,
     pos: fieldData.pos,
     url: fieldData.url,
-    parent_field_id: parentFieldId || null
+    parent_field_id: parentFieldId || null,
+    trigger_option_id: fieldData.trigger_option_id || null
   });
 
   // Update field name to include ID (attr_{id}_{slug}) - only once
@@ -319,7 +322,13 @@ async function createField(formId, fieldData, allFields = []) {
 exports.createField = async (req, res) => {
   try {
     const { formId } = req.params;
-    const { name, label, input_type, parent_name, pos, validation, possible_values, popular_values, placeholder, hint, url } = req.body;
+
+    // Validate formId
+    if (!formId || formId === 'null' || isNaN(parseInt(formId))) {
+      return res.status(400).json({ error: 'Valid formId is required' });
+    }
+
+    const { name, label, input_type, parent_name, trigger_option_id, pos, validation, possible_values, popular_values, placeholder, hint, url } = req.body;
 
     // Find parent field if specified
     let parentFieldId = null;
@@ -344,7 +353,8 @@ exports.createField = async (req, res) => {
       unit: null,
       pos,
       url,  // Set URL after field is created
-      parent_field_id: parentFieldId
+      parent_field_id: parentFieldId,
+      trigger_option_id: trigger_option_id || null
     });
 
     // Update field name to include ID and set URL
@@ -412,6 +422,7 @@ exports.createField = async (req, res) => {
         possible_values: possibleValues,
         parent_name: savedField.parentField ? savedField.parentField.name : null,
         parent_field_id: savedField.parent_field_id,
+        trigger_option_id: savedField.trigger_option_id,
         url: savedField.url
       }
     });
@@ -425,7 +436,7 @@ exports.createField = async (req, res) => {
 exports.updateField = async (req, res) => {
   try {
     const { formId, fieldId } = req.params;
-    const { name, label, input_type, parent_name, pos, validation, possible_values, popular_values, placeholder, hint, url } = req.body;
+    const { name, label, input_type, parent_name, trigger_option_id, pos, validation, possible_values, popular_values, placeholder, hint, url } = req.body;
 
     const field = await Field.findByPk(fieldId);
     if (!field) {
@@ -455,6 +466,7 @@ exports.updateField = async (req, res) => {
     if (hint !== undefined) updateData.hint = hint;
     if (pos !== undefined) updateData.pos = pos;
     if (parentFieldId !== undefined) updateData.parent_field_id = parentFieldId;
+    if (trigger_option_id !== undefined) updateData.trigger_option_id = trigger_option_id;
     
     await field.update(updateData);
 
@@ -541,6 +553,7 @@ exports.updateField = async (req, res) => {
         possible_values: possibleValues,
         parent_name: updatedField.parentField ? updatedField.parentField.name : null,
         parent_field_id: updatedField.parent_field_id,
+        trigger_option_id: updatedField.trigger_option_id,
         url: updatedField.url
       }
     });
