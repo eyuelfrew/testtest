@@ -58,7 +58,7 @@ export default function FormManagementPage({ category, onBack, onFormSaved }) {
                 const response = await fetch(`${API_BASE}/forms`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         name: formName,
                         category_id: category.id,
                         fields: fields // Include all locally added fields
@@ -118,17 +118,17 @@ export default function FormManagementPage({ category, onBack, onFormSaved }) {
 
     const handleDeleteField = async (fieldName) => {
         if (!confirm('Delete this field?')) return;
-        
+
         try {
             // Find the field to get its ID
             const fieldToDelete = fields.find(f => f.name === fieldName);
-            
+
             if (fieldToDelete && fieldToDelete.id) {
                 // Delete from database via API
                 const response = await fetch(`${API_BASE}/forms/${formId}/fields/${fieldToDelete.id}`, {
                     method: 'DELETE'
                 });
-                
+
                 if (response.ok) {
                     // Remove from local state
                     setFields(fields.filter(f => f.name !== fieldName));
@@ -241,7 +241,7 @@ export default function FormManagementPage({ category, onBack, onFormSaved }) {
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
                             title="Back"
                         >
-                            ← 
+                            ←
                         </button>
                     )}
                     <div>
@@ -296,100 +296,149 @@ export default function FormManagementPage({ category, onBack, onFormSaved }) {
                             </button>
                         </div>
 
-                        <div className="space-y-4">
-                            {fields.length === 0 ? (
-                                <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
-                                    <div className="text-4xl mb-4">📝</div>
-                                    <h3 className="text-gray-400 font-medium">No fields yet</h3>
-                                    <button
-                                        onClick={handleAddField}
-                                        className="mt-4 text-blue-600 font-bold hover:underline"
-                                    >
-                                        Add your first attribute
-                                    </button>
-                                </div>
-                            ) : (
-                                fields.map((field, index) => (
-                                    <div 
-                                        key={field.name} 
-                                        style={{ marginLeft: field.trigger_option_id ? '2rem' : '0' }}
-                                        className={`group relative border-2 rounded-2xl p-4 transition-all hover:shadow-md ${
-                                            field.parent_name ? 'border-purple-100 bg-purple-50/30' : 'border-gray-100 bg-white'
-                                        }`}
-                                    >
-                                        {field.trigger_option_id && (
-                                            <div className="absolute -left-5 top-1/2 w-4 h-[2px] bg-purple-200"></div>
-                                        )}
-                                        
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <span className="text-xs font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">#{field.pos}</span>
-                                                    <h3 className="font-bold text-gray-800">{field.label}</h3>
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider bg-white border border-gray-200 text-gray-500 px-2 py-0.5 rounded-full">
-                                                        {field.input_type}
-                                                    </span>
-                                                </div>
+                        <div className="space-y-4">                            {fields.length === 0 ? (
+                            <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
+                                <div className="text-4xl mb-4">📝</div>
+                                <h3 className="text-gray-400 font-medium">No fields yet</h3>
+                                <button
+                                    onClick={handleAddField}
+                                    className="mt-4 text-blue-600 font-bold hover:underline"
+                                >
+                                    Add your first attribute
+                                </button>
+                            </div>
+                        ) : (() => {
+                            // Hierarchical sort: ensure children follow parents
+                            const ordered = [];
+                            const seen = new Set();
 
+                            const addWithChildren = (fieldName) => {
+                                if (seen.has(fieldName)) return;
+                                const field = fields.find(f => f.name === fieldName);
+                                if (!field) return;
+
+                                ordered.push(field);
+                                seen.add(fieldName);
+
+                                // Add children
+                                fields
+                                    .filter(f => f.parent_name === fieldName)
+                                    .sort((a, b) => a.pos - b.pos)
+                                    .forEach(child => addWithChildren(child.name));
+                            };
+
+                            // Start with roots (fields without parents)
+                            fields
+                                .filter(f => !f.parent_name)
+                                .sort((a, b) => a.pos - b.pos)
+                                .forEach(root => addWithChildren(root.name));
+
+                            // Catch any orphans
+                            fields.forEach(f => {
+                                if (!seen.has(f.name)) addWithChildren(f.name);
+                            });
+
+                            return (
+                                <div className="space-y-3">
+                                    {ordered.map((field) => {
+                                        const getDepth = (f, depth = 0) => {
+                                            if (!f.parent_name) return depth;
+                                            const parent = fields.find(p => p.name === f.parent_name);
+                                            return parent ? getDepth(parent, depth + 1) : depth;
+                                        };
+                                        const depth = getDepth(field);
+
+                                        return (
+                                            <div
+                                                key={field.name}
+                                                style={{ marginLeft: `${depth * 2.5}rem` }}
+                                                className={`group relative border-2 rounded-2xl p-4 transition-all hover:shadow-md ${field.parent_name ? 'border-purple-100 bg-purple-50/30' : 'border-gray-100 bg-white'
+                                                    }`}
+                                            >
                                                 {field.parent_name && (
-                                                    <div className="flex items-center gap-1.5 mt-1.5">
-                                                        <span className="text-[11px] text-purple-600 font-bold bg-purple-100/50 px-2 py-0.5 rounded">
-                                                            {field.trigger_option_id 
-                                                                ? `👁 Shows if ${fields.find(f => f.name === field.parent_name)?.label} is "${fields.find(f => f.name === field.parent_name)?.possible_values?.find(o => o.id == field.trigger_option_id)?.value || '...'}"`
-                                                                : `🔗 Options from ${fields.find(f => f.name === field.parent_name)?.label}`
-                                                            }
-                                                        </span>
+                                                    <div
+                                                        className="absolute top-1/2 w-8 h-[2px] bg-purple-100"
+                                                        style={{ left: '-2rem' }}
+                                                    ></div>
+                                                )}
+
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-1">
+                                                            <span className="text-xs font-mono text-gray-400 bg-gray-100/50 px-1.5 py-0.5 rounded">#{field.pos}</span>
+                                                            <h3 className="font-bold text-gray-800">{field.label}</h3>
+                                                            <span className="text-[10px] font-black uppercase tracking-widest bg-white border border-gray-200 text-gray-400 px-2 py-0.5 rounded-md shadow-sm">
+                                                                {field.input_type}
+                                                            </span>
+                                                        </div>
+
+                                                        {field.parent_name && (
+                                                            <div className="flex items-center gap-1.5 mt-2">
+                                                                <span className="text-[10px] text-purple-600 font-bold bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200">
+                                                                    {field.trigger_option_id
+                                                                        ? `👁 Shows if ${fields.find(f => f.name === field.parent_name)?.label} is "${fields.find(f => f.name === field.parent_name)?.possible_values?.find(o => o.id == field.trigger_option_id)?.value || '...'}"`
+                                                                        : `🔗 Options from ${fields.find(f => f.name === field.parent_name)?.label}`
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            <div className="flex items-center gap-1">
-                                                <div className="flex flex-col">
-                                                    <button
-                                                        onClick={() => handleMoveField(index, 'up')}
-                                                        disabled={index === 0}
-                                                        className="p-1 hover:bg-gray-100 rounded text-gray-400 border border-transparent disabled:opacity-0"
-                                                    >
-                                                        ▲
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleMoveField(index, 'down')}
-                                                        disabled={index === fields.length - 1}
-                                                        className="p-1 hover:bg-gray-100 rounded text-gray-400 border border-transparent disabled:opacity-0"
-                                                    >
-                                                        ▼
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex flex-col bg-gray-50 rounded-lg border border-gray-100 p-0.5">
+                                                            <button
+                                                                onClick={() => handleMoveField(fields.indexOf(field), 'up')}
+                                                                disabled={fields.indexOf(field) === 0}
+                                                                className="p-1 hover:bg-white hover:shadow-sm rounded text-gray-400 border border-transparent disabled:opacity-0 transition-all"
+                                                            >
+                                                                ▲
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleMoveField(fields.indexOf(field), 'down')}
+                                                                disabled={fields.indexOf(field) === fields.length - 1}
+                                                                className="p-1 hover:bg-white hover:shadow-sm rounded text-gray-400 border border-transparent disabled:opacity-0 transition-all"
+                                                            >
+                                                                ▼
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="h-10 w-[1px] bg-gray-100 mx-1"></div>
+
+                                                        <button
+                                                            onClick={() => handleEditField(field)}
+                                                            className="px-4 py-2 text-xs font-black uppercase tracking-widest text-blue-600 hover:bg-blue-600 hover:text-white border-2 border-blue-50 bg-blue-50/30 rounded-xl transition-all"
+                                                        >
+                                                            Edit
+                                                        </button>
+
+                                                        {(field.input_type === 'single_select' || field.input_type === 'multiple_select') && (
+                                                            <button
+                                                                onClick={() => handleManageDependencies(field)}
+                                                                className="px-4 py-2 text-xs font-black uppercase tracking-widest text-purple-600 hover:bg-purple-600 hover:text-white border-2 border-purple-50 bg-purple-50/30 rounded-xl transition-all flex items-center gap-2"
+                                                            >
+                                                                <span>Options</span>
+                                                                {field.possible_values?.length > 0 && (
+                                                                    <span className="bg-purple-100 text-purple-600 px-1.5 rounded-md group-hover:bg-purple-500 group-hover:text-white text-[10px]">
+                                                                        {field.possible_values.length}
+                                                                    </span>
+                                                                )}
+                                                            </button>
+                                                        )}
+
+                                                        <button
+                                                            onClick={() => handleDeleteField(field.name)}
+                                                            className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                
-                                                <div className="h-8 w-[1px] bg-gray-100 mx-2"></div>
-
-                                                <button
-                                                    onClick={() => handleEditField(field)}
-                                                    className="px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                                                >
-                                                    Edit
-                                                </button>
-                                                
-                                                {field.input_type === 'single_select' && (
-                                                    <button
-                                                        onClick={() => handleManageDependencies(field)}
-                                                        className="px-3 py-1.5 text-xs font-bold text-purple-600 hover:bg-purple-100 rounded-lg transition-colors flex items-center gap-1"
-                                                    >
-                                                        Options {field.possible_values?.length > 0 && `(${field.possible_values.length})`}
-                                                    </button>
-                                                )}
-
-                                                <button
-                                                    onClick={() => handleDeleteField(field.name)}
-                                                    className="p-1.5 text-gray-300 hover:text-red-500 transition-colors"
-                                                >
-                                                    ✕
-                                                </button>
                                             </div>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })()}
                         </div>
 
                         {fields.length > 0 && (
@@ -425,7 +474,7 @@ export default function FormManagementPage({ category, onBack, onFormSaved }) {
                                     <div className="w-16 h-1 rounded-full bg-gray-800"></div>
                                 </div>
                             </div>
-                            
+
                             <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden h-[600px] border border-gray-200 flex flex-col relative">
                                 <div className="bg-white p-4 border-b">
                                     <div className="h-2 w-1/3 bg-gray-100 rounded-full mb-2"></div>

@@ -19,20 +19,23 @@ export default function OptionDependencyManager({ field, parentField, onClose })
         try {
             setLoading(true);
             
-            // Load parent options
-            const parentRes = await fetch(`${API_BASE}/fields/${parentField.id}/options/manage`);
-            const parentData = await parentRes.json();
-            setParentOptions(parentData.options || []);
+            // Load parent options only if parentField exists
+            if (parentField) {
+                const parentRes = await fetch(`${API_BASE}/fields/${parentField.id}/options/manage`);
+                const parentData = await parentRes.json();
+                const options = parentData.options || [];
+                setParentOptions(options);
 
-            // Load child options
+                // Select first parent option by default if not already selected
+                if (options.length > 0 && !selectedParentOption) {
+                    setSelectedParentOption(options[0].id);
+                }
+            }
+
+            // Load child options (the options for the current field)
             const childRes = await fetch(`${API_BASE}/fields/${field.id}/options/manage`);
             const childData = await childRes.json();
             setChildOptions(childData.options || []);
-
-            // Select first parent option by default
-            if (parentData.options && parentData.options.length > 0) {
-                setSelectedParentOption(parentData.options[0].id);
-            }
 
         } catch (error) {
             console.error('Failed to load data:', error);
@@ -54,7 +57,7 @@ export default function OptionDependencyManager({ field, parentField, onClose })
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         value,
-                        parent_option_id: selectedParentOption
+                        parent_option_id: selectedParentOption || null
                     })
                 });
             }
@@ -100,43 +103,45 @@ export default function OptionDependencyManager({ field, parentField, onClose })
                         Manage {field.label} Options
                     </h2>
                     <p className="text-gray-600 mb-6">
-                        Add options for <strong>{field.label}</strong> and assign them to a <strong>{parentField.label}</strong>
+                        Add options for <strong>{field.label}</strong> {parentField ? `and assign them to a ${parentField.label}` : ''}
                     </p>
 
-                    {/* Parent Selection */}
-                    <div className="mb-6">
-                        <div className="flex justify-between items-end mb-2">
-                            <label className="block text-sm font-semibold text-gray-700">
-                                Step 1: Select {parentField.label}
-                            </label>
-                            <input
-                                type="text"
-                                placeholder={`Filter ${parentField.label}...`}
-                                value={parentSearch}
-                                onChange={(e) => setParentSearch(e.target.value)}
-                                className="px-3 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-48"
-                            />
+                    {/* Parent Selection - only if parentField exists */}
+                    {parentField && (
+                        <div className="mb-6">
+                            <div className="flex justify-between items-end mb-2">
+                                <label className="block text-sm font-semibold text-gray-700">
+                                    Step 1: Select {parentField.label}
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder={`Filter ${parentField.label}...`}
+                                    value={parentSearch}
+                                    onChange={(e) => setParentSearch(e.target.value)}
+                                    className="px-3 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-48"
+                                />
+                            </div>
+                            <select
+                                value={selectedParentOption || ''}
+                                onChange={(e) => setSelectedParentOption(Number(e.target.value))}
+                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                            >
+                                {!selectedParentOption && <option value="">Select...</option>}
+                                {parentOptions
+                                    .filter(p => p.value.toLowerCase().includes(parentSearch.toLowerCase()))
+                                    .map(parent => (
+                                        <option key={parent.id} value={parent.id}>
+                                            {parent.value}
+                                        </option>
+                                    ))}
+                            </select>
                         </div>
-                        <select
-                            value={selectedParentOption || ''}
-                            onChange={(e) => setSelectedParentOption(Number(e.target.value))}
-                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                        >
-                            {!selectedParentOption && <option value="">Select...</option>}
-                            {parentOptions
-                                .filter(p => p.value.toLowerCase().includes(parentSearch.toLowerCase()))
-                                .map(parent => (
-                                    <option key={parent.id} value={parent.id}>
-                                        {parent.value}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
+                    )}
 
                     {/* Add Options */}
                     <div className="mb-6 p-4 bg-gray-50 border rounded-lg">
                         <label className="block text-sm font-semibold mb-2 text-gray-700">
-                            Step 2: Add {field.label} options for "{selectedParent?.value || '...'}"
+                            {parentField ? `Step 2: Add ${field.label} options for "${selectedParent?.value || '...'}"` : `Add options for ${field.label}`}
                         </label>
                         <div className="flex gap-2">
                             <input
@@ -149,7 +154,7 @@ export default function OptionDependencyManager({ field, parentField, onClose })
                             />
                             <button
                                 onClick={handleAddOptions}
-                                disabled={!selectedParentOption || !newOptionValue.trim()}
+                                disabled={(parentField && !selectedParentOption) || !newOptionValue.trim()}
                                 className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
                             >
                                 Add

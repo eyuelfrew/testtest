@@ -127,11 +127,15 @@ export default function DynamicForm({ fields, onSubmit }) {
         setErrors(prev => ({ ...prev, [fieldName]: null }));
 
         // Recursive clear for dependent fields
+        // Recursively clear all children of this field
         const clearChildren = (parentName) => {
             fields.forEach(field => {
                 if (field.parent_name === parentName) {
-                    // Update value
-                    setFormValues(prev => ({ ...prev, [field.name]: '' }));
+                    // Update value (reset to empty array for multi-select, empty string for others)
+                    setFormValues(prev => ({ 
+                        ...prev, 
+                        [field.name]: field.input_type === 'multiple_select' ? [] : '' 
+                    }));
                     
                     // Clear ALL cached options for this child field
                     setFieldOptions(prev => {
@@ -153,6 +157,14 @@ export default function DynamicForm({ fields, onSubmit }) {
         clearChildren(fieldName);
     };
 
+    const handleToggleOption = (fieldName, optionId) => {
+        const currentValues = Array.isArray(formValues[fieldName]) ? formValues[fieldName] : [];
+        const newValues = currentValues.includes(optionId)
+            ? currentValues.filter(id => id !== optionId)
+            : [...currentValues, optionId];
+        handleChange(fieldName, newValues);
+    };
+
     const validate = () => {
         const newErrors = {};
 
@@ -161,8 +173,12 @@ export default function DynamicForm({ fields, onSubmit }) {
 
             if (field.validation) {
                 field.validation.forEach(rule => {
-                    if (rule.type === 'DataRequired' && !value) {
-                        newErrors[field.name] = rule.error_message;
+                    if (rule.type === 'DataRequired') {
+                        if (Array.isArray(value)) {
+                            if (value.length === 0) newErrors[field.name] = rule.error_message;
+                        } else if (!value && value !== 0 && value !== false) {
+                            newErrors[field.name] = rule.error_message;
+                        }
                     }
                 });
             }
@@ -190,10 +206,24 @@ export default function DynamicForm({ fields, onSubmit }) {
         // Is this a conditional (sub) field?
         if (field.trigger_option_id) {
             const parentValue = formValues[field.parent_name];
+            const parentField = fields.find(f => f.name === field.parent_name);
+            
             // If parent value doesn't match the trigger, don't render at all
-            if (String(parentValue) !== String(field.trigger_option_id)) {
-                return null;
+            let isVisible = false;
+
+            if (parentField?.input_type === 'checkbox') {
+                // For checkbox, value is boolean, trigger is "1" or "0"
+                const normalizedValue = parentValue ? "1" : "0";
+                isVisible = normalizedValue === String(field.trigger_option_id);
+            } else if (parentField?.input_type === 'multiple_select') {
+                // For multiple_select, value is array, trigger is a single option ID
+                isVisible = Array.isArray(parentValue) && parentValue.includes(parseInt(field.trigger_option_id));
+            } else {
+                // Default comparison (single_select, etc)
+                isVisible = String(parentValue) === String(field.trigger_option_id);
             }
+
+            if (!isVisible) return null;
         }
 
         // Get options for this field
@@ -263,14 +293,61 @@ export default function DynamicForm({ fields, onSubmit }) {
                     </>
                 )}
 
+                {field.input_type === 'multiple_select' && (
+                    <div className="space-y-2 border-2 border-gray-50 p-3 rounded-xl bg-gray-50/50">
+                        {options.map(opt => (
+                            <label key={opt.id} className="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={Array.isArray(value) && value.includes(opt.id)}
+                                    onChange={() => handleToggleOption(field.name, opt.id)}
+                                    disabled={isDisabled || isLoading}
+                                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                                />
+                                <span className={`text-sm font-medium transition-colors ${Array.isArray(value) && value.includes(opt.id) ? 'text-blue-700' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                                    {opt.value}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                )}
+
+                {field.input_type === 'checkbox' && (
+                    <label className="flex items-center gap-3 p-3 border-2 border-gray-100 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={!!value}
+                            onChange={(e) => handleChange(field.name, e.target.checked)}
+                            disabled={isDisabled}
+                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                        />
+                        <span className="text-sm font-medium text-gray-700">{field.label}</span>
+                    </label>
+                )}
+
+                {(field.input_type === 'number' || field.input_type === 'date') && (
+                    <input
+                        type={field.input_type}
+                        value={value}
+                        onChange={(e) => handleChange(field.name, e.target.value)}
+                        placeholder={field.placeholder || ''}
+                        disabled={isDisabled}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            error ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                        }`}
+                    />
+                )}
+
                 {field.input_type === 'text' && (
                     <input
                         type="text"
                         value={value}
                         onChange={(e) => handleChange(field.name, e.target.value)}
                         placeholder={field.placeholder || ''}
-                        className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                        disabled={isDisabled}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            error ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                        }`}
                     />
                 )}
 
@@ -279,9 +356,11 @@ export default function DynamicForm({ fields, onSubmit }) {
                         value={value}
                         onChange={(e) => handleChange(field.name, e.target.value)}
                         placeholder={field.placeholder || ''}
+                        disabled={isDisabled}
                         rows={4}
-                        className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                            error ? 'border-red-200 bg-red-50' : 'border-gray-100 bg-white hover:border-gray-200'
+                        }`}
                     />
                 )}
 

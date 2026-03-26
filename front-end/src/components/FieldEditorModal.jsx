@@ -170,7 +170,11 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                             >
                                 <option value="text">Text</option>
                                 <option value="textarea">Textarea</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="checkbox">Checkbox (Toggle)</option>
                                 <option value="single_select">Single Select</option>
+                                <option value="multiple_select">Multiple Select</option>
                             </select>
                         </div>
 
@@ -223,10 +227,10 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                             >
                                 <option value="">None</option>
                                 {existingFields
-                                    .filter(f => f.name !== formData.name && f.input_type === 'single_select')
+                                    .filter(f => f.name !== formData.name && (f.input_type === 'single_select' || f.input_type === 'checkbox' || f.input_type === 'multiple_select'))
                                     .map(f => (
                                         <option key={f.name} value={f.name}>
-                                            {f.label}
+                                            {f.label} ({f.input_type})
                                         </option>
                                     ))}
                             </select>
@@ -242,11 +246,18 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                                         className="w-full px-3 py-2 border-2 border-purple-200 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-sm"
                                     >
                                         <option value="">Always (Visible but dependent)</option>
-                                        {existingFields.find(f => f.name === formData.parent_name)?.possible_values?.map(opt => (
-                                            <option key={opt.id} value={opt.id}>
-                                                Show if {existingFields.find(f => f.name === formData.parent_name)?.label} is "{opt.value}"
-                                            </option>
-                                        ))}
+                                        {existingFields.find(f => f.name === formData.parent_name)?.input_type === 'checkbox' ? (
+                                            <>
+                                                <option value="1">Checked (True)</option>
+                                                <option value="0">Unchecked (False)</option>
+                                            </>
+                                        ) : (
+                                            existingFields.find(f => f.name === formData.parent_name)?.possible_values?.map(opt => (
+                                                <option key={opt.id} value={opt.id}>
+                                                    Show if {existingFields.find(f => f.name === formData.parent_name)?.label} is "{opt.value}"
+                                                </option>
+                                            ))
+                                        )}
                                     </select>
                                     <p className="text-[10px] text-purple-600 mt-2 italic">
                                         * Choosing a specific option makes this a "Conditional Field".
@@ -266,8 +277,8 @@ export default function FieldEditorModal({ field, existingFields, onSave, onClos
                             )}
                         </div>
 
-                        {/* Options (only for independent dropdowns) */}
-                        {formData.input_type === 'single_select' && !formData.parent_name && (
+                        {/* Options (only for dropdowns and multiple select) */}
+                        {(formData.input_type === 'single_select' || formData.input_type === 'multiple_select') && !formData.parent_name && (
                             <div className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
                                 <div className="flex justify-between items-center mb-2">
                                     <label className="block text-sm font-medium text-blue-900">
